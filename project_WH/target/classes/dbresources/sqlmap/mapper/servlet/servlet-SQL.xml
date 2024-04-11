@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="servlet">
+
+	<select id="sdList" resultType="HashMap">
+		SELECT sd_nm, sd_cd, ST_AsText(ST_Transform(ST_Centroid(geom), 4326)) AS geom FROM tl_sd;
+	</select>
+
+	<select id="sggList" resultType="HashMap" parameterType="String">
+		SELECT
+		sgg_cd, sgg_nm FROM tl_sgg WHERE sd_nm=(SELECT sd_nm FROM tl_sd WHERE
+		sd_cd=#{sdparam})
+	</select>
+
+ 	<insert id="upfile" parameterType="hashMap">
+		INSERT INTO "TB_CARBON_C4_test"
+		(year_month, site_lo, road_site_lo, sgg_cd, bjdcode, site_div_cd, bun,
+		ji, new_addr_no, new_addr_road_cd, new_addr_under_cd,
+		new_addr_main_no, new_addr_sub_no, usage)
+		VALUES 
+		<foreach collection="list" item="item" separator=",">
+		(#{item.year_month}, #{item.site_lo}, #{item.road_site_lo}, #{item.sgg_cd}, #{item.bjdcode}, #{item.site_div_cd},
+		#{item.bun}, #{item.ji}, #{item.new_addr_no}, #{item.new_addr_road_cd},
+		#{item.new_addr_under_cd}, #{item.new_addr_main_no}, #{item.new_addr_sub_no}, #{item.usage})
+		</foreach>
+	</insert> 
+
+	<select id="sdChartList" resultType="hashMap">
+		SELECT sd_nm, totaluse FROM c4sdview
+	</select>
+	
+	<select id="sggChartList" resultType="hashMap">
+		SELECT sd_cd, sgg_nm, totaluse FROM c4sggview
+	</select>
+	
+</mapper>
